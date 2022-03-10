@@ -1,0 +1,11 @@
+DROP TABLE IF EXISTS "car_option_value" CASCADE;
+DROP TABLE IF EXISTS "car_option";
+DROP TABLE IF EXISTS "car_equipment" CASCADE;
+DROP TABLE IF EXISTS "car_characteristic_value" CASCADE;
+DROP TABLE IF EXISTS "car_characteristic" CASCADE;
+DROP TABLE IF EXISTS "car_modification" CASCADE;
+DROP TABLE IF EXISTS "car_generation" CASCADE;
+DROP TABLE IF EXISTS "car_serie" CASCADE;
+DROP TABLE IF EXISTS "car_model" CASCADE;
+DROP TABLE IF EXISTS "car_mark" CASCADE;
+DROP TABLE IF EXISTS "car_type";

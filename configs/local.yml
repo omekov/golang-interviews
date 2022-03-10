@@ -1,0 +1,8 @@
+postgres:
+  PostgresqlHost: localhost
+  PostgresqlPort: 5433
+  PostgresqlUser: postgres
+  PostgresqlPassword: postgres
+  PostgresqlDbname: salecar
+  PostgresqlSslmode: false
+  PgDriver: postgres
