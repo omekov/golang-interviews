@@ -2,7 +2,6 @@ package carrepository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/omekov/golang-interviews/internal/domain"
@@ -18,7 +17,7 @@ func newCarTypeRepository(db *sqlx.DB) *carTypeRepository {
 	}
 }
 
-type CarType interface {
+type CarTyper interface {
 	Create(ctx context.Context, carType *domain.CarType) error
 	GetByID(ctx context.Context, ID uint) (domain.CarType, error)
 	GetAll(ctx context.Context) ([]domain.CarType, error)
@@ -73,8 +72,7 @@ func (r *carTypeRepository) Update(ctx context.Context, carType *domain.CarType)
 		return err
 	}
 
-	count, err := result.RowsAffected()
-	fmt.Println(count)
+	_, err = result.RowsAffected()
 	return err
 }
 

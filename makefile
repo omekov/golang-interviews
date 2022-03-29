@@ -4,8 +4,14 @@ run:
 test:
 	go test ./... -v -cover
 
+run-sc:
+	build-salecar run-salecar
+
 run-salecar:
-	go run ./cmd/salecar/main.go
+	./.bin/salecar -port 8080 -config ./configs
+
+build-salecar:
+	go build -o ./.bin/salecar ./cmd/salecar/*.go
 
 run-event:
 	go run ./cmd/event/main.go
@@ -29,4 +35,4 @@ migrateup:
 migratedown:
 	migrate -path db/migrations/salecar -database "postgresql://postgres:postgres@localhost:5433/salecar?sslmode=disable" -verbose down
 
-.PHONY: postgres createdb dropdb migrateup migratedown
+.PHONY: postgres createdb dropdb migrateup migratedown build

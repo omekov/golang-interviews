@@ -10,90 +10,71 @@ import (
 	"github.com/omekov/golang-interviews/internal/domain"
 	"github.com/omekov/golang-interviews/internal/salecar/carrepository"
 	"github.com/stretchr/testify/assert"
-
-	_ "github.com/lib/pq"
 )
 
-func TestCarTypeRepository(t *testing.T) {
+var expectedCarType = domain.CarType{
+	ID:   1,
+	Name: "Легковой",
+}
+
+func TestCarType_CRUD(t *testing.T) {
+	t.Parallel()
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
+	if db == nil {
+		panic("db is nil")
+	}
+
 	carrepository := carrepository.NewCarRepository(db)
 
-	createCarTypeRepository(ctx, t, carrepository)
-	getByIDCarTypeRepository(ctx, t, carrepository)
-	getAllCarTypeRepository(ctx, t, carrepository)
-	updateCarTypeRepository(ctx, t, carrepository)
-	deleteCarTypeRepository(ctx, t, carrepository)
-}
-
-func createCarTypeRepository(ctx context.Context, t *testing.T, carrepository carrepository.CarRepository) {
-	carType := domain.CarType{Name: "test"}
-	expandCarType := domain.CarType{ID: 1, Name: "test"}
-
+	carType := domain.CarType{Name: "Легковой"}
 	t.Run("create", func(t *testing.T) {
-		err := carrepository.CarType.Create(ctx, &carType)
-		assert.Nil(t, err)
-		assert.Equal(t, expandCarType.ID, carType.ID)
-		assert.Equal(t, expandCarType.Name, carType.Name)
+		err := carrepository.CarTyper.Create(ctx, &carType)
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, expectedCarType.ID, carType.ID)
 	})
-}
 
-func getByIDCarTypeRepository(ctx context.Context, t *testing.T, carrepository carrepository.CarRepository) {
-	var carTypeID uint = 1
-	expendCarType := domain.CarType{ID: 1, Name: "test"}
 	t.Run("get by id", func(t *testing.T) {
-		carType, err := carrepository.CarType.GetByID(ctx, carTypeID)
-		if err == sql.ErrNoRows {
-			return
+		var err error
+		carType, err = carrepository.CarTyper.GetByID(ctx, carType.ID)
+
+		if err != nil {
+			panic(err)
 		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, expendCarType.ID, carType.ID)
-		assert.Equal(t, expendCarType.Name, carType.Name)
+		assert.Equal(t, expectedCarType.ID, carType.ID)
+		assert.Equal(t, expectedCarType.Name, carType.Name)
 	})
-}
-func getAllCarTypeRepository(ctx context.Context, t *testing.T, carrepository carrepository.CarRepository) {
-	t.Run("get all", func(t *testing.T) {
-		carTypes, err := carrepository.CarType.GetAll(ctx)
-		if err == sql.ErrNoRows {
-			return
-		}
 
-		assert.Nil(t, err)
-		assert.Equal(t, 1, len(carTypes))
-	})
-}
-
-func updateCarTypeRepository(ctx context.Context, t *testing.T, carrepository carrepository.CarRepository) {
-	expendCarType := domain.CarType{Name: "test2"}
-	carType := domain.CarType{ID: 1, Name: "test2"}
+	carType.Name = "Легкавая"
 	t.Run("update", func(t *testing.T) {
-		err := carrepository.CarType.Update(ctx, &carType)
+		err := carrepository.CarTyper.Update(ctx, &carType)
 		if err == sql.ErrNoRows {
 			return
 		}
-
-		assert.Nil(t, err)
-		assert.Equal(t, expendCarType.Name, carType.Name)
+		if err != nil {
+			panic(err)
+		}
+		assert.Equal(t, "Легкавая", carType.Name)
 	})
-}
 
-func deleteCarTypeRepository(ctx context.Context, t *testing.T, carrepository carrepository.CarRepository) {
+	t.Run("get all", func(t *testing.T) {
+		carTypes, err := carrepository.CarTyper.GetAll(ctx)
+		if err != nil {
+			panic(err)
+		}
+		if len(carTypes) == 0 {
+			assert.Fail(t, "cartypes empty")
+		}
+	})
 
-	carType := domain.CarType{Name: "test"}
 	t.Run("delete", func(t *testing.T) {
-		err := carrepository.CarType.Create(ctx, &carType)
-		assert.Nil(t, err)
-
-		err = carrepository.CarType.Delete(ctx, carType.ID)
-		assert.Nil(t, err)
-
-		_, err = carrepository.CarType.GetByID(ctx, carType.ID)
-		if err == sql.ErrNoRows {
-			return
+		err := carrepository.CarTyper.Delete(ctx, carType.ID)
+		if err != nil {
+			panic(err)
 		}
-
-		assert.Nil(t, err)
 	})
+
 }

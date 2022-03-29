@@ -2,12 +2,14 @@ package carrepository
 
 import "github.com/jmoiron/sqlx"
 
-type CarRepository struct {
-	CarType CarType
+type carRepository struct {
+	CarTyper  CarTyper
+	CarMarker CarMarker
 }
 
-func NewCarRepository(db *sqlx.DB) CarRepository {
-	return CarRepository{
-		CarType: newCarTypeRepository(db),
+func NewCarRepository(db *sqlx.DB) *carRepository {
+	return &carRepository{
+		CarTyper:  newCarTypeRepository(db),
+		CarMarker: newCarMarkRepository(db),
 	}
 }

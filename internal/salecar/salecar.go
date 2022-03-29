@@ -4,22 +4,23 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
+	"time"
 
 	_ "github.com/lib/pq"
 	"github.com/omekov/golang-interviews/internal/config"
 	"github.com/omekov/golang-interviews/pkg/postgresql"
 )
 
-var flagConfig = flag.String("config", "./configs/local.yml", "path to the config file")
+var flagConfig = flag.String("config", "local", "path to the config file")
 var flagPort = flag.String("port", "80", "specify the port")
 
 func Run() error {
 	flag.Parse()
-
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	fmt.Println(flagPort)
+	log.Println(*flagPort)
 	cfg, err := config.Get(*flagConfig)
 	if err != nil {
 		return err
@@ -33,24 +34,27 @@ func Run() error {
 		cfg.Postgres.PostgresqlPassword,
 	)
 
-	postgresql.Connection(
+	connectionDelay := 1 * time.Minute
+	db, err := postgresql.Connection(
 		ctx,
 		cfg.Postgres.PgDriver,
 		dataSourceName,
+		connectionDelay,
 	)
+	if err != nil {
+		return err
+	}
 
+	fmt.Println(db.Stats())
 	// services
 	// handlers := delivery.NewHandler(services)
-	// HTTP Server
-	// srv := server.NewServer(cfg, "8080", handlers.Init(cfg))
+	// srv := server.NewServer(cfg, "8080", nil)
 
 	// go func() {
 	// 	if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
-	// 		logger.Errorf("error occurred while running http server: %s\n", err.Error())
+	// 		log.Fatalf("error occurred while running http server: %s\n", err.Error())
 	// 	}
 	// }()
-
-	// logger.Info("Server started")
 
 	return nil
 }

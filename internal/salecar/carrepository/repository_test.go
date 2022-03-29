@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-migrate/migrate/v4"
@@ -14,6 +15,8 @@ import (
 	"github.com/omekov/golang-interviews/pkg/postgresql"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+
+	_ "github.com/lib/pq"
 )
 
 var db *sqlx.DB
@@ -58,7 +61,12 @@ func TestMain(m *testing.M) {
 	}
 
 	log.Println("TestContainer Postgres PORT:", p.Port())
-	db, err = postgresql.Connection(ctx, "postgres", fmt.Sprintf("port=%s user=postgres password=postgres dbname=postgres sslmode=disable", p.Port()))
+	db, err = postgresql.Connection(
+		ctx,
+		"postgres",
+		fmt.Sprintf("port=%s user=postgres password=postgres dbname=postgres sslmode=disable", p.Port()),
+		1*time.Minute,
+	)
 	if err != nil {
 		log.Fatal(fmt.Errorf("postgresql.Connection %s", err))
 	}
@@ -67,7 +75,6 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal(fmt.Errorf("dStub.WithInstance %s", err))
 	}
-
 	migration, err := migrate.NewWithDatabaseInstance("file://../../../db/migrations/salecar", "postgres", instance)
 	if err != nil {
 		log.Fatal(fmt.Errorf("migrate.NewWithDatabaseInstance %s", err))
