@@ -18,14 +18,6 @@ func newCarMarkRepository(db *sqlx.DB) *carMarkRepository {
 	}
 }
 
-type CarMarker interface {
-	Create(ctx context.Context, carMark *domain.CarMark) error
-	GetByID(ctx context.Context, ID uint) (domain.CarMark, error)
-	GetAll(ctx context.Context) ([]domain.CarMark, error)
-	Update(ctx context.Context, carMark *domain.CarMark) error
-	Delete(ctx context.Context, ID uint) error
-}
-
 func (r *carMarkRepository) Create(ctx context.Context, carMark *domain.CarMark) error {
 	return r.db.QueryRowContext(ctx, `
 		INSERT INTO car_mark (

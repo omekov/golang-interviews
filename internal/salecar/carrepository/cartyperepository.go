@@ -17,14 +17,6 @@ func newCarTypeRepository(db *sqlx.DB) *carTypeRepository {
 	}
 }
 
-type CarTyper interface {
-	Create(ctx context.Context, carType *domain.CarType) error
-	GetByID(ctx context.Context, ID uint) (domain.CarType, error)
-	GetAll(ctx context.Context) ([]domain.CarType, error)
-	Update(ctx context.Context, carType *domain.CarType) error
-	Delete(ctx context.Context, ID uint) error
-}
-
 func (r *carTypeRepository) Create(ctx context.Context, carType *domain.CarType) error {
 	return r.db.QueryRowContext(ctx, "INSERT INTO car_type (name) VALUES ($1) RETURNING id", carType.Name).Scan(&carType.ID)
 }
